@@ -1,0 +1,77 @@
+import { readFile, writeFile } from "node:fs/promises"
+import errorHandler from "../middleware/errors.js"
+import mongoose from "mongoose"
+import Task from "../models/tasks.js"
+import ErrorHandler from "../utils/errorHandler.js"
+
+const file = './data/tasks.json'
+
+const viewTasks = async (req, res, next) => {
+    const tasks = await Task.find()
+    res.status(200).json({ success: true, tasks })
+}
+
+// const getValues = async () => {
+//     const data = await readFile(file, 'utf-8')
+//     return JSON.parse(data)
+// }
+const createTasks = async (req, res, next) => {
+    const { title, completed, dueDate, priority, tags } = req.body
+
+    // if (!title || title.trim() === '') {
+    //     return new errorHandler()
+    // }
+    if (!title || title.trim() === '') {
+        return new ErrorHandler('Title is required', 400)
+    }
+    const task = new Task({
+        title,
+        completed: completed,
+        dueDate: dueDate,
+        priority: priority,
+        tags: tags
+    })
+
+    await task.save()
+
+    res.status(201).json(task)
+
+}
+
+const updateTask = async (req, res, next) => {
+    const id = req.params.id
+
+    if (!id || id.trim() === '') {
+        return res.status(400).json({ message: 'ID is required' })
+    }
+
+    const task = await Task.findById(id)
+
+    if (!task) {
+        return res.status(404).json({ message: 'Task not found' })
+    }
+
+    const { completed } = req.body
+
+    task.completed = completed
+    await task.save()
+
+    res.status(200).json(task)
+
+}
+
+const deleteTask = async (req, res, next) => {
+    const id = req.params.id
+    if (!id || id.trim() === '') {
+        return res.status(400).json({ message: 'ID is required' })
+    }
+
+    const deletedTask = await Task.findByIdAndDelete(id)
+    if (!deletedTask) {
+        return res.status(404).json({ message: 'Task not found' })
+    }
+    res.status(200).json({ message: 'Task deleted successfully' })
+}
+export { viewTasks, createTasks, updateTask, deleteTask }
+
+// Continue with pagination, filtering, and sorting features as needed.
