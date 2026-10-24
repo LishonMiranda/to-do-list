@@ -22,7 +22,7 @@ const createTasks = async (req, res, next) => {
     //     return new errorHandler()
     // }
     if (!title || title.trim() === '') {
-        return new ErrorHandler('Title is required', 400)
+        return next(new ErrorHandler('Title is required', 400))
     }
     const task = new Task({
         title,
@@ -42,13 +42,13 @@ const updateTask = async (req, res, next) => {
     const id = req.params.id
 
     if (!id || id.trim() === '') {
-        return res.status(400).json({ message: 'ID is required' })
+        return next(new ErrorHandler('ID is required', 400))
     }
 
     const task = await Task.findById(id)
 
     if (!task) {
-        return res.status(404).json({ message: 'Task not found' })
+        return next(new ErrorHandler('Task not found', 404))
     }
 
     const { completed } = req.body
@@ -63,12 +63,14 @@ const updateTask = async (req, res, next) => {
 const deleteTask = async (req, res, next) => {
     const id = req.params.id
     if (!id || id.trim() === '') {
-        return res.status(400).json({ message: 'ID is required' })
+        return next(new ErrorHandler('ID is required', 400))
     }
-
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return next(new ErrorHandler('Invalid ID format', 400))
+    }
     const deletedTask = await Task.findByIdAndDelete(id)
     if (!deletedTask) {
-        return res.status(404).json({ message: 'Task not found' })
+        return next(new ErrorHandler('Task not found', 404))
     }
     res.status(200).json({ message: 'Task deleted successfully' })
 }

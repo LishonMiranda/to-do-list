@@ -2,7 +2,11 @@ import ErrorHandler from "../utils/errorHandler.js"
 
 const errorHandler = (err, req, res, next) => {
 
-    let error = { ...err }
+    let error = err
+
+    if (process.env.NODE_ENV === 'development') {
+        console.error(err.stack)
+    }
     error = new ErrorHandler(error.message, error.statusCode || 500)
 
     if (err.name === 'ValidationError') {
