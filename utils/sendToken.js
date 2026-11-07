@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 const sendToken = (user, statusCode, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_TIME
+        expiresIn: process.env.JWT_EXPIRES_TIME * 3600 // Convert hours to seconds
     })
 
     const options = {
