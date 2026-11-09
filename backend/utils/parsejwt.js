@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import ErrorHandler from '../utils/errorHandler.js'
+import ErrorHandler from './errorHandler.js'
 
 
 const parseJWT = (req, next) => {
@@ -8,7 +8,7 @@ const parseJWT = (req, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         return decoded.id
     } catch (error) {
-        throw next(new ErrorHandler('Invalid token', 401))
+        throw next(new ErrorHandler('Invalid token or expired', 401))
     }
 }
 

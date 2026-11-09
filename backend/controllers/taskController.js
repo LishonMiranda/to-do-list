@@ -8,25 +8,33 @@ import parseJWT from "../utils/parsejwt.js"
 
 const viewTasks = async (req, res, next) => {
     // Assuming you have the user ID available in req.user
-    const tasks = await Task.find()
-    res.status(200).json({ success: true, tasks })
+    const tasks = await Task.find({ user: parseJWT(req, next) })
+    res.status(200).json({
+        success: true, tasks: tasks.map(task => ({
+            id: task._id,
+            title: task.title,
+            completed: task.completed,
+            dueDate: task.dueDate
+        }))
+
+    })
 }
 
 
 const createTasks = async (req, res, next) => {
-    const { title, completed, dueDate, priority, tags } = req.body
+    const { title, completed, dueDate, priority, tags, description } = req.body
 
 
     if (!title || title.trim() === '') {
         return next(new ErrorHandler('Title is required', 400))
     }
-    const id = parseJWT(req, next)
     const task = new Task({
         title,
         completed: completed,
         dueDate: dueDate,
         priority: priority,
         tags: tags,
+        description: description,
         user: parseJWT(req, next) // Assuming you have the user ID available in req.user
     })
 
