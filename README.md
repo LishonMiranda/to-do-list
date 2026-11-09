@@ -14,7 +14,7 @@ A simple to-do list application built with the MERN stack.
 1. Fork this repository, then clone your fork:
 
    ```bash
-   git clone https://github.com/<your-username>/<repo-name>.git
+   git clone https://github.com/LishonMiranda/to-do-list.git
    ```
 2. Install dependencies:
 
